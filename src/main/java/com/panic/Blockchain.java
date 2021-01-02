@@ -3,12 +3,15 @@ package com.panic;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Blockchain {
     //tracks the complete blockchain data structure
 
     //blockchain as arraylist of blocks
     public static ArrayList<Block> blockchain = new ArrayList<>();
+    //hashmap mapping transaction ids to transaction outputs
+    public static HashMap<String, TransactionOutput> UTXOs = new HashMap<>();
 
     //add new block
     public static void addBlock(String data) {
