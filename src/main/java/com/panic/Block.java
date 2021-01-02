@@ -7,8 +7,8 @@ public class Block {
 
     public String hash;     //current block's hash
     public String prevHash;     //previous block's hash
-    private String data;
-    private long timestamp;
+    private final String data;
+    private final long timestamp;
     private int nonce;  //used to facilitate mining
 
     public Block (String data, String prevHash) {

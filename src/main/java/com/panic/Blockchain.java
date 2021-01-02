@@ -1,12 +1,14 @@
 package com.panic;
 
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 
 public class Blockchain {
     //tracks the complete blockchain data structure
 
     //blockchain as arraylist of blocks
-    public static ArrayList<Block> blockchain = new ArrayList<Block>();
+    public static ArrayList<Block> blockchain = new ArrayList<>();
 
     //add new block
     public static void addBlock(String data) {
@@ -57,5 +59,12 @@ public class Blockchain {
         }
 
         return true;
+    }
+
+    public static void displayChain() {
+        for (Block block : blockchain) {
+            String serial = new GsonBuilder().setPrettyPrinting().create().toJson(block);
+            System.out.println(serial);
+        }
     }
 }
