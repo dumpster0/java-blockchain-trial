@@ -52,8 +52,51 @@ public class Transaction {
             i.UTXO = Blockchain.UTXOs.get(i.transactionOutputId);
         }
 
-        //TODO : continue here
+        if(totalInput() < Constants.minTransaction) {
+            System.out.println("Transaction input amount must be at least 0.5");
+            return false;
+        }
+
+        float change = totalInput() - amount;
+        transactionId = calcHash();
+        outputs.add(new TransactionOutput(this.receiver, amount, transactionId));   //outgoing transactoin
+        outputs.add(new TransactionOutput(this.sender, change, transactionId));   //transaction giving change back to sender
+
+        //add outputs to list of unspent transaction outputs
+        for(TransactionOutput o : outputs) {
+            Blockchain.UTXOs.put(o.id, o);
+        }
+
+        //remove inputs from list of unspent transaction outputs (since they have now been spent)
+        for(TransactionInput i : inputs) {
+            if(i.UTXO == null) {
+                continue;
+            }
+            Blockchain.UTXOs.remove(i.UTXO.id);
+        }
 
         return true;
     }
+
+    //get the total UTXO of all inputs
+    public float totalInput() {
+        float total = 0;
+        for(TransactionInput i : inputs) {
+            if(i == null) {
+                continue;
+            }
+            total += i.UTXO.amount;
+        }
+        return total;
+    }
+
+    //get the total output amount
+    public float totalOutput() {
+        float total = 0;
+        for(TransactionOutput o : outputs) {
+            total += o.amount;
+        }
+        return total;
+    }
+
 }

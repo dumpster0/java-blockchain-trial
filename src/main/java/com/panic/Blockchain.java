@@ -10,22 +10,13 @@ public class Blockchain {
 
     //blockchain as arraylist of blocks
     public static ArrayList<Block> blockchain = new ArrayList<>();
-    //hashmap mapping transaction ids to transaction outputs
+    //hashmap mapping transaction ids to unspent transaction outputs
     public static HashMap<String, TransactionOutput> UTXOs = new HashMap<>();
 
     //add new block
-    public static void addBlock(String data) {
-        String prevHash = "0"; //assign preHash 0 by default
-
-        //assign prevHash the hash of the previous block if the previous block exists
-        //so prevHash remains 0 only for the genesis block
-        if(blockchain.size() > 0) {
-            prevHash = blockchain.get(blockchain.size() - 1).hash;
-        }
-
-        Block newBlock = new Block(data, prevHash);
-        newBlock.mineBlock();
-        blockchain.add(newBlock);
+    public static void addBlock(Block block) {
+        block.mineBlock();
+        blockchain.add(block);
     }
 
     public static Boolean validateChain() {
@@ -58,6 +49,22 @@ public class Blockchain {
             if(!target.equals(currBlock.hash.substring(0, diff))) {
                 System.out.println("Block number " + i + " is unmined");
                 return false;
+            }
+
+            //loop over and verify each transaction in the current block
+            for(int j = 0; j < currBlock.transactions.size(); ++j) {
+                Transaction currTransaction = currBlock.transactions.get(j);
+
+                if(!currTransaction.verifySignature()) {
+                    System.out.println("Signature on transaction " + j + " invalid");
+                    return false;
+                }
+
+                if(currTransaction.totalInput() != currTransaction.totalOutput()) {
+                    System.out.println("Inputs not equal to outputs on transaction " + j);
+                }
+
+                //TODO : add other checks
             }
         }
 

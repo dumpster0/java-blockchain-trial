@@ -3,6 +3,7 @@ package com.panic;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.ArrayList;
 import java.util.Base64;
 
 public class StringUtils {
@@ -64,5 +65,29 @@ public class StringUtils {
     public static String keyToString(Key key) {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
-    
+
+    //get merkle root of any set of transactions
+    public static String getMerkleRoot(ArrayList<Transaction> transactions) {
+        int count = transactions.size();
+        ArrayList<String> treeLayer = new ArrayList<>();    //list to represent a layer (level) of the merkle tree
+
+        //create the bottom layer made up of all transactions
+        for(Transaction t : transactions) {
+            treeLayer.add(t.transactionId);
+        }
+
+        //count = 1 means treeLayer only contains one element (the merkle root), so we loop until then
+        ArrayList<String> newLayer = treeLayer;
+        while(count > 1) {
+            newLayer = new ArrayList<String>();
+            //an element of the new layer is the combined hash of two elements of the layer below
+            for(int i = 1; i < treeLayer.size(); ++i) {
+                newLayer.add(sha256(treeLayer.get(i - 1) + treeLayer.get(i)));
+            }
+            count = newLayer.size();
+            treeLayer = newLayer;
+        }
+
+        return (treeLayer.size() == 1) ? treeLayer.get(0) : "";
+    }
 }
